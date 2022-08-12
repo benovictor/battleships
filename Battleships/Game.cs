@@ -20,35 +20,45 @@ namespace Battleships
         // returns: the number of ships sunk by the set of guesses
         public static int Play(string[] ships, string[] guesses)
         {
-            var shipsLt = new List<Ship>();
-            foreach (var sh in ships)
+
+            try
             {
-                if(Ship.TryCreateShip(sh, out var ship, out var errorMsg))
+                var shipsLt = new List<Ship>();
+                foreach (var sh in ships)
                 {
-                    shipsLt.Add(ship);
+                    if (Ship.TryCreateShip(sh, out var ship, out var errorMsg))
+                    {
+                        shipsLt.Add(ship);
+                    }
+                    else
+                    {
+                        Console.WriteLine(errorMsg);
+                    }
                 }
-                else
+
+                //Hit the ships
+
+                int hit = 0;
+
+                foreach (var guess in guesses)
                 {
-                    Console.WriteLine(errorMsg);
+                    foreach (var ship in shipsLt)
+                    {
+                        ship.Hit(guess);
+                    }
                 }
+
+                //Get the ships sunk
+                var shipsSunk = shipsLt.Where(s => s.IsSunk());
+
+                return shipsSunk.Count();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
 
-            //Hit the ships
-
-            int hit = 0;
-
-            foreach(var guess in guesses)
-            {
-               foreach(var ship in shipsLt)
-               {
-                    ship.Hit(guess);
-               }
-            }
-
-            //Get the ships sunk
-            var shipsSunk = shipsLt.Where(s => s.IsSunk());
-
-            return shipsSunk.Count();
+            return -1;
         }
     }
 
